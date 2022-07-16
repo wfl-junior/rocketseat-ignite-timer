@@ -46,16 +46,39 @@ export const Home: React.FC = () => {
   useEffect(() => {
     if (activeCycle) {
       const interval = setInterval(() => {
-        setAmountSecondsPassed(
-          differenceInSeconds(new Date(), activeCycle.startDate),
+        console.log("interval", activeCycle.id);
+        const secondsPassed = differenceInSeconds(
+          new Date(),
+          activeCycle.startDate,
         );
-      }, 1000);
+
+        setAmountSecondsPassed(secondsPassed);
+
+        if (secondsPassed >= activeCycle.minutesAmount * 60) {
+          clearInterval(interval);
+        }
+      }, 500);
 
       return () => {
         clearInterval(interval);
       };
     }
   }, [activeCycle]);
+
+  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0;
+  const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0;
+
+  const minutesAmount = Math.floor(currentSeconds / 60);
+  const secondsAmount = currentSeconds % 60;
+
+  const minutes = minutesAmount.toString().padStart(2, "0");
+  const seconds = secondsAmount.toString().padStart(2, "0");
+
+  useEffect(() => {
+    if (activeCycle) {
+      document.title = `${minutes}:${seconds} | Ignite Timer`;
+    }
+  }, [minutes, seconds, activeCycle]);
 
   function handleCreateNewCycle(data: NewCycleFormData) {
     const newCycle: Cycle = {
@@ -66,18 +89,10 @@ export const Home: React.FC = () => {
 
     setCycles(cycles => [...cycles, newCycle]);
     setActiveCycleId(newCycle.id);
+    setAmountSecondsPassed(0);
 
     reset();
   }
-
-  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0;
-  const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0;
-
-  const minutesAmount = Math.floor(currentSeconds / 60);
-  const secondsAmount = currentSeconds % 60;
-
-  const minutes = minutesAmount.toString().padStart(2, "0");
-  const seconds = secondsAmount.toString().padStart(2, "0");
 
   const task = watch("task");
   const isSubmitDisabled = !task;
