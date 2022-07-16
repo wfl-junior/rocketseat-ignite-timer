@@ -14,14 +14,30 @@ export const Home: React.FC = () => (
     <form onSubmit={e => e.preventDefault()}>
       <FormContainer>
         <label htmlFor="task">Vou trabalhar em</label>
+
         <TaskInput
           type="text"
           id="task"
           placeholder="Dê um nome para o seu projeto"
+          list="task-suggestions"
         />
 
+        <datalist id="task-suggestions">
+          <option>Projeto 1</option>
+          <option>Projeto 2</option>
+          <option>Projeto 3</option>
+          <option>Banana</option>
+        </datalist>
+
         <label htmlFor="minutesAmount">durante</label>
-        <MinutesAmountInput type="number" id="minutesAmount" placeholder="00" />
+        <MinutesAmountInput
+          type="number"
+          id="minutesAmount"
+          placeholder="00"
+          step={5}
+          min={5}
+          max={60}
+        />
 
         <span>minutos.</span>
       </FormContainer>
