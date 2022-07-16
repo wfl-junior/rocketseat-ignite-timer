@@ -1,9 +1,7 @@
 export const defaultTheme = {
-  colors: {
-    white: "white",
-    primary: "#8257e6",
-    secondary: "orange",
-    danger: "red",
-    success: "green",
-  },
+  white: "white",
+  primary: "#8257e6",
+  secondary: "orange",
+  danger: "red",
+  success: "green",
 };
