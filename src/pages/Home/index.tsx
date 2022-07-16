@@ -1,4 +1,5 @@
 import { Play } from "phosphor-react";
+import { FormEvent } from "react";
 import {
   CountdownContainer,
   FormContainer,
@@ -9,53 +10,59 @@ import {
   TaskInput,
 } from "./styles";
 
-export const Home: React.FC = () => (
-  <HomeContainer>
-    <form onSubmit={e => e.preventDefault()}>
-      <FormContainer>
-        <label htmlFor="task">Vou trabalhar em</label>
+export const Home: React.FC = () => {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+  }
 
-        <TaskInput
-          type="text"
-          id="task"
-          placeholder="Dê um nome para o seu projeto"
-          list="task-suggestions"
-        />
+  return (
+    <HomeContainer>
+      <form onSubmit={handleSubmit}>
+        <FormContainer>
+          <label htmlFor="task">Vou trabalhar em</label>
 
-        <datalist id="task-suggestions">
-          <option>Projeto 1</option>
-          <option>Projeto 2</option>
-          <option>Projeto 3</option>
-          <option>Banana</option>
-        </datalist>
+          <TaskInput
+            type="text"
+            id="task"
+            placeholder="Dê um nome para o seu projeto"
+            list="task-suggestions"
+          />
 
-        <label htmlFor="minutesAmount">durante</label>
-        <MinutesAmountInput
-          type="number"
-          id="minutesAmount"
-          placeholder="00"
-          step={5}
-          min={5}
-          max={60}
-        />
+          <datalist id="task-suggestions">
+            <option>Projeto 1</option>
+            <option>Projeto 2</option>
+            <option>Projeto 3</option>
+            <option>Banana</option>
+          </datalist>
 
-        <span>minutos.</span>
-      </FormContainer>
+          <label htmlFor="minutesAmount">durante</label>
+          <MinutesAmountInput
+            type="number"
+            id="minutesAmount"
+            placeholder="00"
+            step={5}
+            min={5}
+            max={60}
+          />
 
-      <CountdownContainer>
-        <span>0</span>
-        <span>0</span>
+          <span>minutos.</span>
+        </FormContainer>
 
-        <Separator>:</Separator>
+        <CountdownContainer>
+          <span>0</span>
+          <span>0</span>
 
-        <span>0</span>
-        <span>0</span>
-      </CountdownContainer>
+          <Separator>:</Separator>
 
-      <StartCountdownButton type="submit">
-        <Play size={24} />
-        Começar
-      </StartCountdownButton>
-    </form>
-  </HomeContainer>
-);
+          <span>0</span>
+          <span>0</span>
+        </CountdownContainer>
+
+        <StartCountdownButton type="submit" disabled>
+          <Play size={24} />
+          Começar
+        </StartCountdownButton>
+      </form>
+    </HomeContainer>
+  );
+};
