@@ -23,7 +23,7 @@ const newCycleFormValidationSchema = zod.object({
 type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>;
 
 export const Home: React.FC = () => {
-  const { register, handleSubmit, watch } = useForm<NewCycleFormData>({
+  const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),
     defaultValues: {
       task: "",
@@ -33,6 +33,8 @@ export const Home: React.FC = () => {
 
   function handleCreateNewCycle(data: NewCycleFormData) {
     console.log(data);
+
+    reset();
   }
 
   const task = watch("task");
