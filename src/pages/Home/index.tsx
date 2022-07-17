@@ -4,15 +4,12 @@ import { HandPalm, Play } from "phosphor-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as zod from "zod";
+import { Countdown } from "./Countdown";
+import { NewCycleForm } from "./NewCycleForm";
 import {
-  CountdownContainer,
-  FormContainer,
   HomeContainer,
-  MinutesAmountInput,
-  Separator,
   StartCountdownButton,
   StopCountdownButton,
-  TaskInput,
 } from "./styles";
 
 const newCycleFormValidationSchema = zod.object({
@@ -135,51 +132,8 @@ export const Home: React.FC = () => {
   return (
     <HomeContainer>
       <form onSubmit={handleSubmit(handleCreateNewCycle)}>
-        <FormContainer>
-          <label htmlFor="task">Vou trabalhar em</label>
-
-          <TaskInput
-            type="text"
-            id="task"
-            placeholder="Dê um nome para o seu projeto"
-            list="task-suggestions"
-            disabled={!!activeCycle}
-            autoComplete="off"
-            {...register("task")}
-          />
-
-          <datalist id="task-suggestions">
-            <option>Projeto 1</option>
-            <option>Projeto 2</option>
-            <option>Projeto 3</option>
-            <option>Banana</option>
-          </datalist>
-
-          <label htmlFor="minutesAmount">durante</label>
-
-          <MinutesAmountInput
-            type="number"
-            id="minutesAmount"
-            placeholder="00"
-            step={5}
-            min={5}
-            max={60}
-            disabled={!!activeCycle}
-            {...register("minutesAmount", { valueAsNumber: true })}
-          />
-
-          <span>minutos.</span>
-        </FormContainer>
-
-        <CountdownContainer>
-          <span>{minutes[0]}</span>
-          <span>{minutes[1]}</span>
-
-          <Separator>:</Separator>
-
-          <span>{seconds[0]}</span>
-          <span>{seconds[1]}</span>
-        </CountdownContainer>
+        <NewCycleForm />
+        <Countdown />
 
         {activeCycle ? (
           <StopCountdownButton type="button" onClick={handleInterruptCycle}>
