@@ -18,7 +18,7 @@ export const Countdown: React.FC = () => {
       const interval = setInterval(() => {
         const secondsPassed = differenceInSeconds(
           new Date(),
-          activeCycle.startDate,
+          new Date(activeCycle.startDate),
         );
 
         setAmountSecondsPassed(secondsPassed);

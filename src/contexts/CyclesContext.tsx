@@ -1,7 +1,9 @@
+import { differenceInSeconds } from "date-fns";
 import React, {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useReducer,
   useState,
 } from "react";
@@ -28,6 +30,8 @@ interface CycleContextData {
 const CyclesContext = createContext({} as CycleContextData);
 export const useCyclesContext = () => useContext(CyclesContext);
 
+const cyclesStorageKey = "@ignite-timer:cycles-state-0.1.0";
+
 interface CyclesContextProviderProps {
   children: React.ReactNode;
 }
@@ -35,12 +39,50 @@ interface CyclesContextProviderProps {
 export const CyclesContextProvider: React.FC<CyclesContextProviderProps> = ({
   children,
 }) => {
-  const [{ cycles, activeCycleId }, dispatch] = useReducer(cyclesReducer, {
-    cycles: [],
-    activeCycleId: null,
+  const [cyclesState, dispatch] = useReducer(
+    cyclesReducer,
+    {
+      cycles: [],
+      activeCycleId: null,
+    },
+    initialState => {
+      const existingCyclesStorage = localStorage.getItem(cyclesStorageKey);
+
+      if (existingCyclesStorage) {
+        return JSON.parse(existingCyclesStorage);
+      }
+
+      return initialState;
+    },
+  );
+
+  const { cycles, activeCycleId } = cyclesState;
+  const activeCycle = cycles.find(cycle => cycle.id === activeCycleId);
+
+  const finishActiveCycle = useCallback(() => {
+    dispatch(finishActiveCycleAction());
+  }, []);
+
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState<number>(() => {
+    if (activeCycle) {
+      const secondsPassed = differenceInSeconds(
+        new Date(),
+        new Date(activeCycle.startDate),
+      );
+
+      if (secondsPassed >= activeCycle.minutesAmount * 60) {
+        finishActiveCycle();
+      }
+
+      return secondsPassed;
+    }
+
+    return 0;
   });
 
-  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0);
+  useEffect(() => {
+    localStorage.setItem(cyclesStorageKey, JSON.stringify(cyclesState));
+  }, [cyclesState]);
 
   const createNewCycle: CycleContextData["createNewCycle"] = useCallback(
     newCycleData => {
@@ -61,12 +103,6 @@ export const CyclesContextProvider: React.FC<CyclesContextProviderProps> = ({
     dispatch(interruptActiveCycleAction());
     setAmountSecondsPassed(0);
   }, []);
-
-  const finishActiveCycle = useCallback(() => {
-    dispatch(finishActiveCycleAction());
-  }, []);
-
-  const activeCycle = cycles.find(cycle => cycle.id === activeCycleId);
 
   return (
     <CyclesContext.Provider
