@@ -1,3 +1,4 @@
+import { produce } from "immer";
 import { Cycle } from "../../pages/Home";
 import { CyclesAction } from "./actions";
 
@@ -14,45 +15,40 @@ export const cyclesReducer: React.Reducer<CyclesState, CyclesAction> = (
     case "ADD_NEW_CYCLE": {
       const { newCycle } = action.payload;
 
-      return {
-        ...state,
-        cycles: [...state.cycles, newCycle],
-        activeCycleId: newCycle.id,
-      };
+      return produce(state, draft => {
+        draft.cycles.push(newCycle);
+        draft.activeCycleId = newCycle.id;
+      });
     }
 
     case "INTERRUPT_ACTIVE_CYCLE": {
-      return {
-        ...state,
-        activeCycleId: null,
-        cycles: state.cycles.map(cycle => {
-          if (cycle.id === state.activeCycleId) {
-            return {
-              ...cycle,
-              interruptedDate: new Date(),
-            };
-          }
+      const activeCycleIndex = state.cycles.findIndex(
+        cycle => cycle.id === state.activeCycleId,
+      );
 
-          return cycle;
-        }),
-      };
+      if (activeCycleIndex < 0) {
+        return state;
+      }
+
+      return produce(state, draft => {
+        draft.activeCycleId = null;
+        draft.cycles[activeCycleIndex].interruptedDate = new Date();
+      });
     }
 
     case "FINISH_CURRENT_CYCLE": {
-      return {
-        ...state,
-        activeCycleId: null,
-        cycles: state.cycles.map(cycle => {
-          if (cycle.id === state.activeCycleId) {
-            return {
-              ...cycle,
-              finishedDate: new Date(),
-            };
-          }
+      const activeCycleIndex = state.cycles.findIndex(
+        cycle => cycle.id === state.activeCycleId,
+      );
 
-          return cycle;
-        }),
-      };
+      if (activeCycleIndex < 0) {
+        return state;
+      }
+
+      return produce(state, draft => {
+        draft.activeCycleId = null;
+        draft.cycles[activeCycleIndex].finishedDate = new Date();
+      });
     }
 
     default: {
