@@ -81,6 +81,23 @@ export const CyclesContextProvider: React.FC<CyclesContextProviderProps> = ({
           };
         }
 
+        case "FINISH_CURRENT_CYCLE": {
+          return {
+            ...state,
+            activeCycleId: null,
+            cycles: state.cycles.map(cycle => {
+              if (cycle.id === activeCycleId) {
+                return {
+                  ...cycle,
+                  finishedDate: new Date(),
+                };
+              }
+
+              return cycle;
+            }),
+          };
+        }
+
         default: {
           return state;
         }
@@ -95,22 +112,7 @@ export const CyclesContextProvider: React.FC<CyclesContextProviderProps> = ({
   const [amountSecondsPassed, setAmountSecondsPassed] = useState(0);
 
   const finishActiveCycle = useCallback(() => {
-    // setCycles(cycles => {
-    //   return cycles.map(cycle => {
-    //     if (cycle.id === activeCycleId) {
-    //       return {
-    //         ...cycle,
-    //         finishedDate: new Date(),
-    //       };
-    //     }
-
-    //     return cycle;
-    //   });
-    // });
-
     dispatch({ type: "FINISH_CURRENT_CYCLE" });
-
-    // setActiveCycleId(null);
   }, []);
 
   const createNewCycle: CycleContextData["createNewCycle"] = useCallback(
