@@ -1,5 +1,5 @@
 import { HandPalm, Play } from "phosphor-react";
-import { useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import { Countdown } from "./Countdown";
 import { NewCycleForm, NewCycleFormData } from "./NewCycleForm";
 import {
@@ -15,9 +15,38 @@ export interface Cycle extends NewCycleFormData {
   finishedDate?: Date;
 }
 
+interface CycleContextData {
+  activeCycle?: Cycle;
+  cycles: Cycle[];
+  markActiveCycleAsFinished: () => void;
+  resetActiveCycle: () => void;
+}
+
+const CyclesContext = createContext({} as CycleContextData);
+export const useCyclesContext = () => useContext(CyclesContext);
+
 export const Home: React.FC = () => {
   const [cycles, setCycles] = useState<Cycle[]>([]);
   const [activeCycleId, setActiveCycleId] = useState<Cycle["id"] | null>(null);
+
+  const resetActiveCycle = useCallback(() => {
+    setActiveCycleId(null);
+  }, []);
+
+  const markActiveCycleAsFinished = useCallback(() => {
+    setCycles(cycles => {
+      return cycles.map(cycle => {
+        if (cycle.id === activeCycleId) {
+          return {
+            ...cycle,
+            finishedDate: new Date(),
+          };
+        }
+
+        return cycle;
+      });
+    });
+  }, [activeCycleId]);
 
   const activeCycle = cycles.find(cycle => cycle.id === activeCycleId);
 
@@ -59,12 +88,17 @@ export const Home: React.FC = () => {
   return (
     <HomeContainer>
       <form onSubmit={handleSubmit(handleCreateNewCycle)}>
-        <NewCycleForm />
-        <Countdown
-          activeCycle={activeCycle}
-          setCycles={setCycles}
-          activeCycleId={activeCycleId}
-        />
+        <CyclesContext.Provider
+          value={{
+            activeCycle,
+            cycles,
+            markActiveCycleAsFinished,
+            resetActiveCycle,
+          }}
+        >
+          <NewCycleForm />
+          <Countdown />
+        </CyclesContext.Provider>
 
         {activeCycle ? (
           <StopCountdownButton type="button" onClick={handleInterruptCycle}>
