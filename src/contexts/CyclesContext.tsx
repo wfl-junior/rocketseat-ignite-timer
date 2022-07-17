@@ -10,10 +10,11 @@ import React, {
 import { Cycle, NewCycleFormData } from "../pages/Home";
 import {
   addNewCycleAction,
+  CyclesAction,
   finishActiveCycleAction,
   interruptActiveCycleAction,
 } from "../reducers/cycles/actions";
-import { cyclesReducer } from "../reducers/cycles/reducer";
+import { cyclesReducer, CyclesState } from "../reducers/cycles/reducer";
 
 interface CreateCycleData extends NewCycleFormData {}
 
@@ -39,7 +40,10 @@ interface CyclesContextProviderProps {
 export const CyclesContextProvider: React.FC<CyclesContextProviderProps> = ({
   children,
 }) => {
-  const [cyclesState, dispatch] = useReducer(
+  const [cyclesState, dispatch] = useReducer<
+    React.Reducer<CyclesState, CyclesAction>,
+    CyclesState
+  >(
     cyclesReducer,
     {
       cycles: [],

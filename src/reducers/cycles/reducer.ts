@@ -2,7 +2,7 @@ import { produce } from "immer";
 import { Cycle } from "../../pages/Home";
 import { CyclesAction } from "./actions";
 
-interface CyclesState {
+export interface CyclesState {
   cycles: Cycle[];
   activeCycleId: Cycle["id"] | null;
 }
