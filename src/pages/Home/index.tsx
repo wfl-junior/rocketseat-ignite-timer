@@ -29,6 +29,7 @@ interface Cycle extends NewCycleFormData {
   id: string;
   startDate: Date;
   interruptedDate?: Date;
+  finishedDate?: Date;
 }
 
 export const Home: React.FC = () => {
@@ -48,6 +49,8 @@ export const Home: React.FC = () => {
   useEffect(() => {
     if (activeCycle) {
       const interval = setInterval(() => {
+        console.log("interval", activeCycle.id);
+
         const secondsPassed = differenceInSeconds(
           new Date(),
           activeCycle.startDate,
@@ -56,7 +59,20 @@ export const Home: React.FC = () => {
         setAmountSecondsPassed(secondsPassed);
 
         if (secondsPassed >= activeCycle.minutesAmount * 60) {
-          clearInterval(interval);
+          setCycles(cycles => {
+            return cycles.map(cycle => {
+              if (cycle.id === activeCycle.id) {
+                return {
+                  ...cycle,
+                  finishedDate: new Date(),
+                };
+              }
+
+              return cycle;
+            });
+          });
+
+          setActiveCycleId(null);
         }
       }, 500);
 
@@ -110,6 +126,7 @@ export const Home: React.FC = () => {
     });
 
     setActiveCycleId(null);
+    setAmountSecondsPassed(0);
   }
 
   const task = watch("task");
@@ -127,6 +144,7 @@ export const Home: React.FC = () => {
             placeholder="Dê um nome para o seu projeto"
             list="task-suggestions"
             disabled={!!activeCycle}
+            autoComplete="off"
             {...register("task")}
           />
 
