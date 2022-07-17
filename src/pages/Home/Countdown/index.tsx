@@ -3,13 +3,14 @@ import { useEffect } from "react";
 import { useCyclesContext } from "../../../contexts/CyclesContext";
 import { CountdownContainer, Separator } from "./styles";
 
+const originalTitle = document.title;
+
 export const Countdown: React.FC = () => {
   const {
     activeCycle,
-    markActiveCycleAsFinished,
-    resetActiveCycle,
     amountSecondsPassed,
     setAmountSecondsPassed,
+    finishActiveCycle,
   } = useCyclesContext();
 
   useEffect(() => {
@@ -23,8 +24,7 @@ export const Countdown: React.FC = () => {
         setAmountSecondsPassed(secondsPassed);
 
         if (secondsPassed >= activeCycle.minutesAmount * 60) {
-          markActiveCycleAsFinished();
-          resetActiveCycle();
+          finishActiveCycle();
         }
       }, 500);
 
@@ -32,7 +32,7 @@ export const Countdown: React.FC = () => {
         clearInterval(interval);
       };
     }
-  }, [activeCycle, markActiveCycleAsFinished, resetActiveCycle]);
+  }, [activeCycle, finishActiveCycle]);
 
   const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0;
   const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0;
@@ -45,7 +45,9 @@ export const Countdown: React.FC = () => {
 
   useEffect(() => {
     if (activeCycle) {
-      document.title = `${minutes}:${seconds} | Ignite Timer`;
+      document.title = `${minutes}:${seconds} | ${originalTitle}`;
+    } else {
+      document.title = originalTitle;
     }
   }, [minutes, seconds, activeCycle]);
 

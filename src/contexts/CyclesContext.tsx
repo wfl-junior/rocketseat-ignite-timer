@@ -8,8 +8,7 @@ interface CycleContextData {
   activeCycle: Cycle | undefined;
   amountSecondsPassed: number;
   setAmountSecondsPassed: React.Dispatch<React.SetStateAction<number>>;
-  markActiveCycleAsFinished: () => void;
-  resetActiveCycle: () => void;
+  finishActiveCycle: () => void;
   createNewCycle: (newCycleData: CreateCycleData) => void;
   interruptActiveCycle: () => void;
 }
@@ -28,11 +27,7 @@ export const CyclesContextProvider: React.FC<CyclesContextProviderProps> = ({
   const [activeCycleId, setActiveCycleId] = useState<Cycle["id"] | null>(null);
   const [amountSecondsPassed, setAmountSecondsPassed] = useState(0);
 
-  const resetActiveCycle = useCallback(() => {
-    setActiveCycleId(null);
-  }, []);
-
-  const markActiveCycleAsFinished = useCallback(() => {
+  const finishActiveCycle = useCallback(() => {
     setCycles(cycles => {
       return cycles.map(cycle => {
         if (cycle.id === activeCycleId) {
@@ -45,6 +40,8 @@ export const CyclesContextProvider: React.FC<CyclesContextProviderProps> = ({
         return cycle;
       });
     });
+
+    setActiveCycleId(null);
   }, [activeCycleId]);
 
   const createNewCycle: CycleContextData["createNewCycle"] = useCallback(
@@ -89,8 +86,7 @@ export const CyclesContextProvider: React.FC<CyclesContextProviderProps> = ({
         activeCycle,
         amountSecondsPassed,
         setAmountSecondsPassed,
-        markActiveCycleAsFinished,
-        resetActiveCycle,
+        finishActiveCycle,
         createNewCycle,
         interruptActiveCycle,
       }}
