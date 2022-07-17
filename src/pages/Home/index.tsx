@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { differenceInSeconds } from "date-fns";
-import { Play } from "phosphor-react";
+import { HandPalm, Play } from "phosphor-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as zod from "zod";
@@ -11,6 +11,7 @@ import {
   MinutesAmountInput,
   Separator,
   StartCountdownButton,
+  StopCountdownButton,
   TaskInput,
 } from "./styles";
 
@@ -27,6 +28,7 @@ type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>;
 interface Cycle extends NewCycleFormData {
   id: string;
   startDate: Date;
+  interruptedDate?: Date;
 }
 
 export const Home: React.FC = () => {
@@ -46,7 +48,6 @@ export const Home: React.FC = () => {
   useEffect(() => {
     if (activeCycle) {
       const interval = setInterval(() => {
-        console.log("interval", activeCycle.id);
         const secondsPassed = differenceInSeconds(
           new Date(),
           activeCycle.startDate,
@@ -94,6 +95,23 @@ export const Home: React.FC = () => {
     reset();
   }
 
+  function handleInterruptCycle() {
+    setCycles(cycles => {
+      return cycles.map(cycle => {
+        if (cycle.id === activeCycleId) {
+          return {
+            ...cycle,
+            interruptedDate: new Date(),
+          };
+        }
+
+        return cycle;
+      });
+    });
+
+    setActiveCycleId(null);
+  }
+
   const task = watch("task");
   const isSubmitDisabled = !task;
 
@@ -108,6 +126,7 @@ export const Home: React.FC = () => {
             id="task"
             placeholder="Dê um nome para o seu projeto"
             list="task-suggestions"
+            disabled={!!activeCycle}
             {...register("task")}
           />
 
@@ -127,6 +146,7 @@ export const Home: React.FC = () => {
             step={5}
             min={5}
             max={60}
+            disabled={!!activeCycle}
             {...register("minutesAmount", { valueAsNumber: true })}
           />
 
@@ -143,10 +163,17 @@ export const Home: React.FC = () => {
           <span>{seconds[1]}</span>
         </CountdownContainer>
 
-        <StartCountdownButton type="submit" disabled={isSubmitDisabled}>
-          <Play size={24} />
-          Começar
-        </StartCountdownButton>
+        {activeCycle ? (
+          <StopCountdownButton type="button" onClick={handleInterruptCycle}>
+            <HandPalm size={24} />
+            Interromper
+          </StopCountdownButton>
+        ) : (
+          <StartCountdownButton type="submit" disabled={isSubmitDisabled}>
+            <Play size={24} />
+            Começar
+          </StartCountdownButton>
+        )}
       </form>
     </HomeContainer>
   );
