@@ -1,18 +1,20 @@
 import { differenceInSeconds } from "date-fns";
-import { useEffect, useState } from "react";
-import { useCyclesContext } from "..";
+import { useEffect } from "react";
+import { useCyclesContext } from "../CyclesContext";
 import { CountdownContainer, Separator } from "./styles";
 
 export const Countdown: React.FC = () => {
-  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0);
-  const { activeCycle, markActiveCycleAsFinished, resetActiveCycle } =
-    useCyclesContext();
+  const {
+    activeCycle,
+    markActiveCycleAsFinished,
+    resetActiveCycle,
+    amountSecondsPassed,
+    setAmountSecondsPassed,
+  } = useCyclesContext();
 
   useEffect(() => {
     if (activeCycle) {
       const interval = setInterval(() => {
-        console.log("interval", activeCycle.id);
-
         const secondsPassed = differenceInSeconds(
           new Date(),
           activeCycle.startDate,
