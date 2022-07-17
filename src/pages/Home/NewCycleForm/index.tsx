@@ -1,6 +1,6 @@
 import { useFormContext } from "react-hook-form";
 import { NewCycleFormData } from "..";
-import { useCyclesContext } from "../CyclesContext";
+import { useCyclesContext } from "../../../contexts/CyclesContext";
 import { FormContainer, MinutesAmountInput, TaskInput } from "./styles";
 
 export const NewCycleForm: React.FC = () => {
