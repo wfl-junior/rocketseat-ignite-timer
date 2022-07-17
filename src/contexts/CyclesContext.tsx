@@ -1,4 +1,10 @@
-import React, { createContext, useCallback, useContext, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useReducer,
+  useState,
+} from "react";
 import { Cycle, NewCycleFormData } from "../pages/Home";
 
 interface CreateCycleData extends NewCycleFormData {}
@@ -23,22 +29,39 @@ interface CyclesContextProviderProps {
 export const CyclesContextProvider: React.FC<CyclesContextProviderProps> = ({
   children,
 }) => {
-  const [cycles, setCycles] = useState<Cycle[]>([]);
+  const [cycles, dispatch] = useReducer((state: Cycle[], action: any) => {
+    switch (action.type) {
+      case "ADD_NEW_CYCLE": {
+        return [...state, action.payload.newCycle];
+      }
+      default: {
+        return state;
+      }
+    }
+  }, []);
+
   const [activeCycleId, setActiveCycleId] = useState<Cycle["id"] | null>(null);
   const [amountSecondsPassed, setAmountSecondsPassed] = useState(0);
 
   const finishActiveCycle = useCallback(() => {
-    setCycles(cycles => {
-      return cycles.map(cycle => {
-        if (cycle.id === activeCycleId) {
-          return {
-            ...cycle,
-            finishedDate: new Date(),
-          };
-        }
+    // setCycles(cycles => {
+    //   return cycles.map(cycle => {
+    //     if (cycle.id === activeCycleId) {
+    //       return {
+    //         ...cycle,
+    //         finishedDate: new Date(),
+    //       };
+    //     }
 
-        return cycle;
-      });
+    //     return cycle;
+    //   });
+    // });
+
+    dispatch({
+      type: "FINISH_CURRENT_CYCLE",
+      payload: {
+        activeCycleId,
+      },
     });
 
     setActiveCycleId(null);
@@ -52,7 +75,13 @@ export const CyclesContextProvider: React.FC<CyclesContextProviderProps> = ({
         startDate: new Date(),
       };
 
-      setCycles(cycles => [...cycles, newCycle]);
+      dispatch({
+        type: "ADD_NEW_CYCLE",
+        payload: {
+          newCycle,
+        },
+      });
+
       setActiveCycleId(newCycle.id);
       setAmountSecondsPassed(0);
     },
@@ -60,17 +89,24 @@ export const CyclesContextProvider: React.FC<CyclesContextProviderProps> = ({
   );
 
   const interruptActiveCycle = useCallback(() => {
-    setCycles(cycles => {
-      return cycles.map(cycle => {
-        if (cycle.id === activeCycleId) {
-          return {
-            ...cycle,
-            interruptedDate: new Date(),
-          };
-        }
+    // setCycles(cycles => {
+    //   return cycles.map(cycle => {
+    //     if (cycle.id === activeCycleId) {
+    //       return {
+    //         ...cycle,
+    //         interruptedDate: new Date(),
+    //       };
+    //     }
 
-        return cycle;
-      });
+    //     return cycle;
+    //   });
+    // });
+
+    dispatch({
+      type: "INTERRUPT_ACTIVE_CYCLE",
+      payload: {
+        activeCycleId,
+      },
     });
 
     setActiveCycleId(null);
