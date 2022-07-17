@@ -6,7 +6,12 @@ import React, {
   useState,
 } from "react";
 import { Cycle, NewCycleFormData } from "../pages/Home";
-import { cyclesReducer } from "../reducers/cycles";
+import {
+  addNewCycleAction,
+  finishActiveCycleAction,
+  interruptActiveCycleAction,
+} from "../reducers/cycles/actions";
+import { cyclesReducer } from "../reducers/cycles/reducer";
 
 interface CreateCycleData extends NewCycleFormData {}
 
@@ -37,22 +42,15 @@ export const CyclesContextProvider: React.FC<CyclesContextProviderProps> = ({
 
   const [amountSecondsPassed, setAmountSecondsPassed] = useState(0);
 
-  const finishActiveCycle = useCallback(() => {
-    dispatch({ type: "FINISH_CURRENT_CYCLE" });
-  }, []);
-
   const createNewCycle: CycleContextData["createNewCycle"] = useCallback(
     newCycleData => {
-      const newCycle: Cycle = {
-        ...newCycleData,
-        id: Date.now().toString(),
-        startDate: new Date(),
-      };
-
-      dispatch({
-        type: "ADD_NEW_CYCLE",
-        payload: { newCycle },
-      });
+      dispatch(
+        addNewCycleAction({
+          ...newCycleData,
+          id: Date.now().toString(),
+          startDate: new Date(),
+        }),
+      );
 
       setAmountSecondsPassed(0);
     },
@@ -60,8 +58,12 @@ export const CyclesContextProvider: React.FC<CyclesContextProviderProps> = ({
   );
 
   const interruptActiveCycle = useCallback(() => {
-    dispatch({ type: "INTERRUPT_ACTIVE_CYCLE" });
+    dispatch(interruptActiveCycleAction());
     setAmountSecondsPassed(0);
+  }, []);
+
+  const finishActiveCycle = useCallback(() => {
+    dispatch(finishActiveCycleAction());
   }, []);
 
   const activeCycle = cycles.find(cycle => cycle.id === activeCycleId);

@@ -1,23 +1,10 @@
-import { Cycle } from "../pages/Home";
+import { Cycle } from "../../pages/Home";
+import { CyclesAction } from "./actions";
 
 interface CyclesState {
   cycles: Cycle[];
   activeCycleId: Cycle["id"] | null;
 }
-
-type CyclesAction =
-  | {
-      type: "ADD_NEW_CYCLE";
-      payload: {
-        newCycle: Cycle;
-      };
-    }
-  | {
-      type: "INTERRUPT_ACTIVE_CYCLE";
-    }
-  | {
-      type: "FINISH_CURRENT_CYCLE";
-    };
 
 export const cyclesReducer: React.Reducer<CyclesState, CyclesAction> = (
   state,
